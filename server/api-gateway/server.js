@@ -35,12 +35,12 @@ const forwardRequest = (baseURL) => {
   };
 };
 
-app.use("/api/users", forwardRequest("http://localhost:5001/users"));
-app.use("/api/stream", forwardRequest("http://localhost:5002/stream"));
-app.use("/api/ads", forwardRequest("http://localhost:5003/ads"));
-app.use("/api/search", forwardRequest("http://localhost:5004/search"));
-app.use("/api/recommendations", forwardRequest("http://localhost:5005/recommendations"));
-app.use("/api/analytics", forwardRequest("http://localhost:5006/analytics"));
+app.use("/api/users", forwardRequest("http://user-service:5001/users"));
+app.use("/api/stream", forwardRequest("http://streaming-service:5002/stream"));
+app.use("/api/ads", forwardRequest("http://ad-service:5003/ads"));
+app.use("/api/search", forwardRequest("http://search-service:5004/search"));
+app.use("/api/recommendations", forwardRequest("http://recommendation-service:5005/recommendations"));
+app.use("/api/analytics", forwardRequest("http://analytics-service:5006/analytics"));
 
 
 app.listen(5000, () => {

@@ -1,0 +1,80 @@
+version: "3.8"
+
+services:
+
+  mongo:
+    image: mongo
+    container_name: spotify-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  user-service:
+    build: ./services/user-service
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mongo
+    env_file:
+      - ./services/user-service/.env
+
+  streaming-service:
+    build: ./services/streaming-service
+    ports:
+      - "5002:5002"
+    depends_on:
+      - mongo
+    env_file:
+      - ./services/streaming-service/.env
+
+  ad-service:
+    build: ./services/ad-service
+    ports:
+      - "5003:5003"
+    depends_on:
+      - mongo
+    env_file:
+      - ./services/ad-service/.env
+
+  search-service:
+    build: ./services/search-service
+    ports:
+      - "5004:5004"
+    depends_on:
+      - mongo
+    env_file:
+      - ./services/search-service/.env
+
+  recommendation-service:
+    build: ./services/recommendation-service
+    ports:
+      - "5005:5005"
+    depends_on:
+      - mongo
+    env_file:
+      - ./services/recommendation-service/.env
+
+  analytics-service:
+    build: ./services/analytics-service
+    ports:
+      - "5006:5006"
+    depends_on:
+      - mongo
+    env_file:
+      - ./services/analytics-service/.env
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "5000:5000"
+    depends_on:
+      - user-service
+      - streaming-service
+      - ad-service
+      - search-service
+      - recommendation-service
+      - analytics-service
+
+volumes:
+  mongo-data:
