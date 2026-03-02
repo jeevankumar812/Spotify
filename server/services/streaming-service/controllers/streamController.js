@@ -1,32 +1,42 @@
 import Song from "../models/Song.js";
-import User from "../models/User.js";
 import Ad from "../models/Ad.js";
 
 export const streamSong = async (req, res) => {
   try {
     const { songId } = req.params;
 
+    // 1️⃣ Find song
     const song = await Song.findById(songId);
-    if (!song)
+    if (!song) {
       return res.status(404).json({ message: "Song not found" });
+    }
 
+    // 2️⃣ Increase play count
     song.playCount++;
     await song.save();
 
-    const user = await User.findById(req.user?.id);
-    if (!user)
-      return res.status(404).json({ message: "User not found in streaming DB" });
+    // 3️⃣ Check user subscription from JWT
+    // Assume JWT contains: { id, subscriptionType }
+    const subscriptionType = req.user?.subscriptionType;
 
-    if (user.subscriptionType === "free") {
+    if (!subscriptionType) {
+      return res.status(401).json({ message: "Invalid token data" });
+    }
+
+    // 4️⃣ If FREE user → serve ad
+    if (subscriptionType === "free") {
       const ad = await Ad.findOne();
+
       if (ad) {
         ad.impressions++;
         await ad.save();
       }
+
       return res.json({ ad, song });
     }
 
-    res.json({ song });
+    // 5️⃣ Premium users → no ads
+    return res.json({ song });
 
   } catch (error) {
     console.error("FULL STREAM ERROR:", error);

@@ -2,67 +2,114 @@ version: "3.8"
 
 services:
 
-  mongo:
-    image: mongo
-    container_name: spotify-mongo
+  # -------------------------
+  # MongoDB Replica Set Nodes
+  # -------------------------
+
+  mongo1:
+    image: mongo:6
+    container_name: mongo1
+    command: ["--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - mongo1-data:/data/db
+    networks:
+      - spotify-network
+
+  mongo2:
+    image: mongo:6
+    container_name: mongo2
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo2-data:/data/db
+    networks:
+      - spotify-network
+
+  mongo3:
+    image: mongo:6
+    container_name: mongo3
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo3-data:/data/db
+    networks:
+      - spotify-network
+
+
+  # -------------------------
+  # Microservices
+  # -------------------------
 
   user-service:
     build: ./services/user-service
     ports:
       - "5001:5001"
     depends_on:
-      - mongo
+      - mongo1
     env_file:
       - ./services/user-service/.env
+    networks:
+      - spotify-network
 
   streaming-service:
     build: ./services/streaming-service
     ports:
       - "5002:5002"
     depends_on:
-      - mongo
+      - mongo1
     env_file:
       - ./services/streaming-service/.env
+    networks:
+      - spotify-network
 
   ad-service:
     build: ./services/ad-service
     ports:
       - "5003:5003"
     depends_on:
-      - mongo
+      - mongo1
     env_file:
       - ./services/ad-service/.env
+    networks:
+      - spotify-network
 
   search-service:
     build: ./services/search-service
     ports:
       - "5004:5004"
     depends_on:
-      - mongo
+      - mongo1
     env_file:
       - ./services/search-service/.env
+    networks:
+      - spotify-network
 
   recommendation-service:
     build: ./services/recommendation-service
     ports:
       - "5005:5005"
     depends_on:
-      - mongo
+      - mongo1
     env_file:
       - ./services/recommendation-service/.env
+    networks:
+      - spotify-network
 
   analytics-service:
     build: ./services/analytics-service
     ports:
       - "5006:5006"
     depends_on:
-      - mongo
+      - mongo1
     env_file:
       - ./services/analytics-service/.env
+    networks:
+      - spotify-network
+
+
+  # -------------------------
+  # API Gateway
+  # -------------------------
 
   api-gateway:
     build: ./api-gateway
@@ -75,6 +122,24 @@ services:
       - search-service
       - recommendation-service
       - analytics-service
+    networks:
+      - spotify-network
+
+
+# -------------------------
+# Volumes
+# -------------------------
 
 volumes:
-  mongo-data:
+  mongo1-data:
+  mongo2-data:
+  mongo3-data:
+
+
+# -------------------------
+# Network
+# -------------------------
+
+networks:
+  spotify-network:
+    driver: bridge
