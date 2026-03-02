@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+import { publishEvent } from "../utils/rabbitmq.js";
 // ✅ REGISTER
 export const register = async (req, res) => {
   try {
@@ -19,6 +19,13 @@ export const register = async (req, res) => {
       email,
       password: hashed,
       subscriptionType: "free" // ✅ default plan
+    });
+
+    await publishEvent({
+    type: "USER_REGISTERED",
+    userId: user._id,
+    email: user.email,
+    timestamp: new Date()
     });
 
     res.status(201).json({

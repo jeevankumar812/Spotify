@@ -2,21 +2,22 @@ import mongoose from "mongoose";
 
 export const getAnalytics = async (req, res) => {
   try {
-    const userDB = mongoose.connection.useDb("userDB");
-    const musicDB = mongoose.connection.useDb("musicDB");
+    const analyticsDB = mongoose.connection.useDb("analyticsDB");
 
-    const users = await userDB.collection("users").countDocuments();
-    const songs = await musicDB.collection("songs").countDocuments();
+    const stats = await analyticsDB.collection("stats").findOne({ _id: "global" }) || {
+      totalUsers: 0,
+      totalStreams: 0
+    };
 
-    const topSongs = await musicDB.collection("songs")
+    const topSongs = await analyticsDB.collection("songStats")
       .find()
       .sort({ playCount: -1 })
       .limit(3)
       .toArray();
 
     res.json({
-      totalUsers: users,
-      totalSongs: songs,
+      totalUsers: stats.totalUsers || 0,
+      totalStreams: stats.totalStreams || 0,
       topSongs
     });
 

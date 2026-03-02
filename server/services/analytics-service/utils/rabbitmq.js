@@ -19,23 +19,49 @@ export const connectRabbitMQ = async () => {
       channel.consume("analytics_queue", async (msg) => {
         if (!msg) return;
 
-        const event = JSON.parse(msg.content.toString());
-        console.log("Received Event:", event);
+        try {
+          const event = JSON.parse(msg.content.toString());
+          console.log("Received Event:", event);
 
-        const analyticsDB = mongoose.connection.useDb("analyticsDB");
+          const analyticsDB = mongoose.connection.useDb("analyticsDB");
 
-        if (event.type === "SONG_PLAYED") {
+          // Always store raw event
           await analyticsDB.collection("events").insertOne(event);
-        }
 
-        channel.ack(msg);
+          if (event.type === "USER_REGISTERED") {
+            await analyticsDB.collection("stats").updateOne(
+              { _id: "global" },
+              { $inc: { totalUsers: 1 } },
+              { upsert: true }
+            );
+          }
+
+          if (event.type === "SONG_PLAYED") {
+            await analyticsDB.collection("stats").updateOne(
+              { _id: "global" },
+              { $inc: { totalStreams: 1 } },
+              { upsert: true }
+            );
+
+            await analyticsDB.collection("songStats").updateOne(
+              { songId: event.songId },
+              { $inc: { playCount: 1 } },
+              { upsert: true }
+            );
+          }
+
+          channel.ack(msg);
+
+        } catch (err) {
+          console.error("Event processing error:", err);
+        }
       });
 
       return;
 
     } catch (error) {
       attempts++;
-      console.log(`RabbitMQ not ready (Analytics). Retry ${attempts}/${maxRetries}`);
+      console.log(`RabbitMQ not ready (Analytics). Retry ${attempts}/10`);
       await new Promise(res => setTimeout(res, 3000));
     }
   }
