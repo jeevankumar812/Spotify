@@ -3,9 +3,12 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import adRoutes from "./routes/adRoutes.js";
+import { connectRabbitMQ } from "./utils/rabbitmq.js";
 
 dotenv.config();
 connectDB();  // 🔥 IMPORTANT
+
+connectRabbitMQ();
 
 const app = express();
 

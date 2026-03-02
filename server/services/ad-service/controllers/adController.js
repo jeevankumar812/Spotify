@@ -1,4 +1,5 @@
 import Ad from "../models/Ad.js";
+import { publishEvent } from "../utils/rabbitmq.js";
 
 export const clickAd = async (req, res) => {
   try {
@@ -9,6 +10,12 @@ export const clickAd = async (req, res) => {
 
     // Increment clicks
     ad.clicks += 1;
+
+    await publishEvent({
+    type: "AD_CLICKED",
+    adId: ad._id,
+    timestamp: new Date()
+  });
 
     // Ensure costPerClick exists
     const costPerClick = ad.costPerClick || 5; // default ₹5 per click

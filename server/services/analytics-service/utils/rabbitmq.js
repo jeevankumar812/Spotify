@@ -48,7 +48,22 @@ export const connectRabbitMQ = async () => {
               { $inc: { playCount: 1 } },
               { upsert: true }
             );
-          }
+            }
+
+            if (event.type === "AD_CLICKED") {
+
+            await analyticsDB.collection("stats").updateOne(
+                { _id: "global" },
+                { $inc: { totalAdClicks: 1 } },
+                { upsert: true }
+            );
+
+            await analyticsDB.collection("adStats").updateOne(
+             { adId: event.adId },
+            { $inc: { clicks: 1 } },
+            { upsert: true }
+        );
+    }
 
           channel.ack(msg);
 
