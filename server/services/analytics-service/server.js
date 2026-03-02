@@ -3,9 +3,20 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
+import { connectRabbitMQ } from "./utils/rabbitmq.js";
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled Rejection:", err);
+});
 
 dotenv.config();
 connectDB();  // 🔥 REQUIRED
+
+connectRabbitMQ();
 
 const app = express();
 

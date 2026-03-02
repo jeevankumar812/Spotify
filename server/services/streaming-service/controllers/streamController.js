@@ -1,5 +1,6 @@
 import Song from "../models/Song.js";
 import Ad from "../models/Ad.js";
+import { publishEvent } from "../utils/rabbitmq.js";
 
 export const streamSong = async (req, res) => {
   try {
@@ -14,6 +15,13 @@ export const streamSong = async (req, res) => {
     // 2️⃣ Increase play count
     song.playCount++;
     await song.save();
+
+    await publishEvent({
+    type: "SONG_PLAYED",
+    songId: song._id,
+    userId: req.user.id,
+    timestamp: new Date()
+    });
 
     // 3️⃣ Check user subscription from JWT
     // Assume JWT contains: { id, subscriptionType }
