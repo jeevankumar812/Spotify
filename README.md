@@ -238,7 +238,7 @@ This decouples services and improves scalability.
 
 # 🖥️ Outputs Screen
 
-## Screen 1
+## Cashing
 
 <p align="center">
   <img src="./assets/sc1.png" width="900"/>
@@ -246,7 +246,7 @@ This decouples services and improves scalability.
 
 ---
 
-## Screen 2
+## Message Queue(RabbitMQ)
 
 <p align="center">
   <img src="./assets/sc2.png" width="900"/>
@@ -254,7 +254,7 @@ This decouples services and improves scalability.
 
 ---
 
-## Screen 3
+## Load Balancer(nginx) and EDA(Event Driven Architecture)
 
 <p align="center">
   <img src="./assets/sc3.png" width="900"/>
