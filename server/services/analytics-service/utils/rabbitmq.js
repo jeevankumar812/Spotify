@@ -1,5 +1,6 @@
 import amqp from "amqplib";
 import mongoose from "mongoose";
+import redisClient from "./redisClient.js";
 
 export const connectRabbitMQ = async () => {
   const maxRetries = 10;
@@ -28,6 +29,9 @@ export const connectRabbitMQ = async () => {
           // Always store raw event
           await analyticsDB.collection("events").insertOne(event);
 
+          // --------------------------
+          // USER_REGISTERED
+          // --------------------------
           if (event.type === "USER_REGISTERED") {
             await analyticsDB.collection("stats").updateOne(
               { _id: "global" },
@@ -36,6 +40,9 @@ export const connectRabbitMQ = async () => {
             );
           }
 
+          // --------------------------
+          // SONG_PLAYED
+          // --------------------------
           if (event.type === "SONG_PLAYED") {
             await analyticsDB.collection("stats").updateOne(
               { _id: "global" },
@@ -48,22 +55,28 @@ export const connectRabbitMQ = async () => {
               { $inc: { playCount: 1 } },
               { upsert: true }
             );
-            }
+          }
 
-            if (event.type === "AD_CLICKED") {
-
+          // --------------------------
+          // AD_CLICKED
+          // --------------------------
+          if (event.type === "AD_CLICKED") {
             await analyticsDB.collection("stats").updateOne(
-                { _id: "global" },
-                { $inc: { totalAdClicks: 1 } },
-                { upsert: true }
+              { _id: "global" },
+              { $inc: { totalAdClicks: 1 } },
+              { upsert: true }
             );
 
             await analyticsDB.collection("adStats").updateOne(
-             { adId: event.adId },
-            { $inc: { clicks: 1 } },
-            { upsert: true }
-        );
-    }
+              { adId: event.adId },
+              { $inc: { clicks: 1 } },
+              { upsert: true }
+            );
+          }
+
+          // 🔥 CACHE INVALIDATION (VERY IMPORTANT)
+          await redisClient.del("analytics:global");
+          console.log("Redis cache invalidated 🔄");
 
           channel.ack(msg);
 
