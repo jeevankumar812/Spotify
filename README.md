@@ -3,6 +3,10 @@
 A production-style distributed Spotify backend built using **Microservices Architecture**, 
 featuring:
 
+## 🏗️ System Architecture Diagram
+
+![Spotify System Design](./assets/spotify_design.png)
+
 - 🐳 Docker Containerization
 - 🗄️ MongoDB Replica Set (Database Replication)
 - 📨 RabbitMQ (Event-Driven Architecture)
