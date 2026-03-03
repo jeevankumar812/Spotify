@@ -234,6 +234,34 @@ This decouples services and improves scalability.
 
 ---
 
+---
+
+# 🖥️ Outputs Screen
+
+## Screen 1
+
+<p align="center">
+  <img src="./assets/sc1.png" width="900"/>
+</p>
+
+---
+
+## Screen 2
+
+<p align="center">
+  <img src="./assets/sc2.png" width="900"/>
+</p>
+
+---
+
+## Screen 3
+
+<p align="center">
+  <img src="./assets/sc3.png" width="900"/>
+</p>
+
+---
+
 ## 👨‍💻 Author
 
 **K Jeevan Kumar**  
