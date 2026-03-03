@@ -7,7 +7,7 @@ A production-style distributed Spotify backend built using **Microservices Archi
 ## 🏗️ System Architecture Diagram
 
 <p align="center">
-  <img src="./assets/spotify_design.png" width="900"/>
+  <img src="./assets/spotify_design.png" width="600"/>
 </p>
 
 ---
